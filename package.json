@@ -1,0 +1,21 @@
+{
+  "name": "fb-page-manager",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal Facebook Page publishing dashboard using the official Meta Graph API.",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "facebook",
+    "meta",
+    "graph-api",
+    "page-publishing"
+  ],
+  "license": "UNLICENSED"
+}

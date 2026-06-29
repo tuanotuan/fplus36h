@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FB Page Manager</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">f</div>
+          <div>
+            <h1>FB Page Manager</h1>
+            <p>Personal Page publishing</p>
+          </div>
+        </div>
+
+        <div class="status-panel">
+          <div class="status-line">
+            <span>Meta App</span>
+            <strong id="configuredState">...</strong>
+          </div>
+          <div class="status-line">
+            <span>Facebook</span>
+            <strong id="connectedState">...</strong>
+          </div>
+          <div class="status-line">
+            <span>Pages</span>
+            <strong id="pageCount">0</strong>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <button class="nav-item active" data-tab="compose">Compose</button>
+          <button class="nav-item" data-tab="settings">Settings</button>
+          <button class="nav-item" data-tab="activity">Activity</button>
+        </nav>
+      </aside>
+
+      <main class="workspace">
+        <section class="topbar">
+          <div>
+            <h2 id="viewTitle">Compose</h2>
+            <p id="viewSubtitle">Post now or schedule a Page post from your local machine.</p>
+          </div>
+          <div class="top-actions">
+            <a class="button secondary" href="/auth/login" id="connectBtn">Connect Facebook</a>
+            <button class="button ghost" id="refreshBtn">Refresh</button>
+          </div>
+        </section>
+
+        <section class="view active" id="composeView">
+          <div class="editor-layout">
+            <form class="panel composer" id="composerForm">
+              <div class="field-row">
+                <label for="pageSelect">Page</label>
+                <select id="pageSelect" required>
+                  <option value="">No Page connected</option>
+                </select>
+              </div>
+
+              <div class="field-row">
+                <label for="messageInput">Content</label>
+                <textarea id="messageInput" rows="10" placeholder="Write your Page post..." required></textarea>
+              </div>
+
+              <div class="field-row">
+                <label for="linkInput">Link</label>
+                <input id="linkInput" type="url" placeholder="https://example.com/article" />
+              </div>
+
+              <div class="field-row">
+                <label for="publishAtInput">Schedule</label>
+                <input id="publishAtInput" type="datetime-local" />
+              </div>
+
+              <div class="action-row">
+                <button class="button primary" type="submit" data-mode="now">Post now</button>
+                <button class="button secondary" type="button" id="scheduleBtn">Schedule</button>
+              </div>
+
+              <p class="hint">
+                Works with Pages you manage through official Meta permissions. Keep Facebook Login in Development mode for your own tester/admin account.
+              </p>
+            </form>
+
+            <section class="panel preview">
+              <div class="preview-page" id="previewPage">Select a Page</div>
+              <div class="preview-message" id="previewMessage">Your post preview will appear here.</div>
+              <div class="preview-link" id="previewLink" hidden></div>
+            </section>
+          </div>
+
+          <section class="table-panel">
+            <div class="section-head">
+              <h3>Scheduled posts</h3>
+              <button class="icon-button" id="reloadJobsBtn" title="Reload">Refresh</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Page</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Post</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="jobsTable">
+                  <tr><td colspan="5" class="empty">No scheduled posts yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="settingsView">
+          <form class="panel settings-form" id="configForm">
+            <div class="field-row">
+              <label for="appIdInput">Facebook App ID</label>
+              <input id="appIdInput" autocomplete="off" required />
+            </div>
+            <div class="field-row">
+              <label for="appSecretInput">Facebook App Secret</label>
+              <input id="appSecretInput" type="password" autocomplete="off" required />
+            </div>
+            <div class="field-row">
+              <label for="graphVersionInput">Graph API version</label>
+              <input id="graphVersionInput" placeholder="v23.0" required />
+            </div>
+            <div class="field-row">
+              <label>OAuth redirect URI</label>
+              <div class="copy-line">
+                <code id="redirectUriValue">http://localhost:8787/auth/callback</code>
+                <button class="button ghost" type="button" id="copyRedirectBtn">Copy</button>
+              </div>
+            </div>
+            <div class="action-row">
+              <button class="button primary" type="submit">Save config</button>
+            </div>
+          </form>
+
+          <section class="panel notes">
+            <h3>Meta setup</h3>
+            <ol>
+              <li>Create a Meta app, add Facebook Login, and add the redirect URI above.</li>
+              <li>Use your own Facebook account as an app admin, developer, or tester.</li>
+              <li>Request/use Page permissions: <code>pages_show_list</code>, <code>pages_read_engagement</code>, <code>pages_manage_posts</code>.</li>
+              <li>Connect Facebook, then pick a Page in Compose.</li>
+            </ol>
+          </section>
+        </section>
+
+        <section class="view" id="activityView">
+          <section class="table-panel">
+            <div class="section-head">
+              <h3>Activity log</h3>
+              <button class="icon-button" id="reloadActivityBtn" title="Reload">Refresh</button>
+            </div>
+            <div id="activityList" class="activity-list"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/app.js"></script>
+  </body>
+</html>
