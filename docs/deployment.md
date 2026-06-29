@@ -91,12 +91,28 @@ https://fplus36h.onrender.com/auth/callback
 
 ### Render Deploy Hook
 
-The deploy workflow conditionally triggers a Render web service after successful CI on `main` using these GitHub repository secrets:
+The deploy workflow triggers Render after successful CI on `main`.
+
+Recommended one-secret setup:
+
+1. Open the Render service.
+2. Go to **Settings** and copy the service **Deploy Hook** URL.
+3. In GitHub, add repository secret:
+
+```text
+RENDER_DEPLOY_HOOK_URL
+```
+
+The workflow will call that hook after CI passes.
+
+Alternative API setup:
 
 ```text
 RENDER_API_KEY
 RENDER_SERVICE_ID
 ```
+
+If `RENDER_DEPLOY_HOOK_URL` is set, it is used first. Otherwise, both API secrets are required.
 
 Render service settings:
 

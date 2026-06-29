@@ -18,14 +18,23 @@ jobs:
     steps:
       - name: Deploy to Render when configured
         env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
         run: |
-          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_SERVICE_ID" ]; then
-            echo "Render secrets are not configured; skipping deploy."
+          if [ -n "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "Triggering Render deploy hook."
+            curl --fail-with-body --request POST "$RENDER_DEPLOY_HOOK_URL"
             exit 0
           fi
 
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_SERVICE_ID" ]; then
+            echo "Render deploy is not configured."
+            echo "Set RENDER_DEPLOY_HOOK_URL, or set both RENDER_API_KEY and RENDER_SERVICE_ID."
+            exit 1
+          fi
+
+          echo "Triggering Render deploy through the Render API."
           curl --fail-with-body --request POST \
             "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
             --header "Authorization: Bearer $RENDER_API_KEY" \
