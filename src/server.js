@@ -9,7 +9,8 @@ const publicDir = path.join(root, "public");
 const dataDir = path.join(root, "data");
 
 const port = Number(process.env.PORT || 8787);
-const baseUrl = process.env.BASE_URL || `http://localhost:${port}`;
+const renderHost = process.env.RENDER_EXTERNAL_HOSTNAME;
+const baseUrl = process.env.BASE_URL || (renderHost ? `https://${renderHost}` : `http://localhost:${port}`);
 
 const paths = {
   config: path.join(dataDir, "config.json"),

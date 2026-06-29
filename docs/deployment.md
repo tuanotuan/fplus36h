@@ -60,6 +60,35 @@ https://your-domain.example/auth/callback
 
 ## Production
 
+### Render Blueprint
+
+This repo includes `render.yaml`, so it can be deployed from the Render Dashboard as a Blueprint:
+
+```text
+https://dashboard.render.com/blueprint/new?repo=https://github.com/tuanotuan/fplus36h
+```
+
+The Blueprint creates one Docker web service named `fplus36h`, uses `/health`, and prompts for:
+
+```text
+FACEBOOK_APP_ID
+FACEBOOK_APP_SECRET
+```
+
+When running on Render, the app derives `BASE_URL` from `RENDER_EXTERNAL_HOSTNAME` if `BASE_URL` is not set manually. The public app URL should be:
+
+```text
+https://fplus36h.onrender.com
+```
+
+After the first successful deploy, add this callback URL in Meta Facebook Login:
+
+```text
+https://fplus36h.onrender.com/auth/callback
+```
+
+### Render Deploy Hook
+
 The deploy workflow conditionally triggers a Render web service after successful CI on `main` using these GitHub repository secrets:
 
 ```text

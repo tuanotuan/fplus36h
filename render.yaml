@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: fplus36h
+    runtime: docker
+    repo: https://github.com/tuanotuan/fplus36h
+    branch: main
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: GRAPH_VERSION
+        value: v23.0
+      - key: FACEBOOK_APP_ID
+        sync: false
+      - key: FACEBOOK_APP_SECRET
+        sync: false

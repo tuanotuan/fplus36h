@@ -81,6 +81,7 @@ docker-compose.yml
 .env.example   Local environment template
 .github/       CI and Render deploy trigger
 docs/          Deployment notes
+render.yaml    Render Blueprint
 ```
 
 ## Local Data
@@ -97,3 +98,9 @@ Do not share the `data/` folder or `.env`.
 ## Deployment
 
 See `docs/deployment.md`.
+
+Render Blueprint link:
+
+```text
+https://dashboard.render.com/blueprint/new?repo=https://github.com/tuanotuan/fplus36h
+```
