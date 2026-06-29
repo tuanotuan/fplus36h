@@ -104,3 +104,15 @@ Render Blueprint link:
 ```text
 https://dashboard.render.com/blueprint/new?repo=https://github.com/tuanotuan/fplus36h
 ```
+
+## Documentation
+
+| Document | Purpose |
+| --- | --- |
+| `docs/project_context.md` | Current state, constraints, and startup notes |
+| `docs/architecture.md` | Runtime architecture and data ownership |
+| `docs/api.md` | HTTP route contracts |
+| `docs/database.md` | JSON runtime storage model |
+| `docs/deployment.md` | Docker, Render, CI, and environment notes |
+| `docs/decisions.md` | Architecture and operations decisions |
+| `docs/changelog.md` | Completed changes |
