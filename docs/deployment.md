@@ -75,6 +75,8 @@ FACEBOOK_APP_ID
 FACEBOOK_APP_SECRET
 ```
 
+The Blueprint intentionally omits a `repo` field. Render should use the GitHub repository connected when the Blueprint is created, which keeps commit-based auto deploys wired to that GitHub connection.
+
 When running on Render, the app derives `BASE_URL` from `RENDER_EXTERNAL_HOSTNAME` if `BASE_URL` is not set manually. The public app URL should be:
 
 ```text
