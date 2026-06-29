@@ -139,16 +139,155 @@ async function getPageById(pageId) {
   return (auth.pages || []).find((page) => String(page.id) === String(pageId));
 }
 
-async function publishPagePost(pageId, message, link) {
+function toStringList(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item || "").trim()).filter(Boolean);
+  }
+  return String(value || "")
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function normalizePostPayload(body) {
+  const postType = String(body.postType || (body.videoUrl ? "video" : body.imageUrls ? "photos" : body.link ? "link" : "status"));
+  const destinationType = String(body.destinationType || "page");
+  const product = body.product && typeof body.product === "object" ? body.product : {};
+
+  return {
+    pageId: String(body.pageId || ""),
+    destinationType,
+    postType,
+    message: String(body.message || ""),
+    link: String(body.link || "").trim(),
+    imageUrls: toStringList(body.imageUrls),
+    videoUrl: String(body.videoUrl || "").trim(),
+    product: {
+      name: String(product.name || "").trim(),
+      price: String(product.price || "").trim(),
+      location: String(product.location || "").trim(),
+      description: String(product.description || "").trim()
+    }
+  };
+}
+
+function assertSupportedDestination(payload) {
+  if (payload.destinationType === "page") return;
+  if (payload.destinationType === "group") {
+    throw new Error("Đăng trực tiếp lên nhóm không được hỗ trợ trong app này vì Meta đã ngừng Groups API đăng bài trên Graph API mới. Hãy dùng Page hoặc đăng thủ công trong Facebook.");
+  }
+  if (payload.destinationType === "marketplace") {
+    throw new Error("Marketplace không có API đăng sản phẩm công khai cho app cá nhân. App chỉ có thể chuẩn bị nội dung sản phẩm để bạn đăng thủ công.");
+  }
+  throw new Error("Điểm đăng không được hỗ trợ.");
+}
+
+function buildProductMessage(payload) {
+  const parts = [];
+  if (payload.product.name) parts.push(payload.product.name);
+  if (payload.product.price) parts.push(`Giá: ${payload.product.price}`);
+  if (payload.product.location) parts.push(`Khu vực: ${payload.product.location}`);
+  if (payload.product.description) parts.push(payload.product.description);
+  if (payload.link) parts.push(payload.link);
+  if (payload.message.trim()) parts.push(payload.message.trim());
+  return parts.join("\n\n");
+}
+
+function validateUrlList(urls, label) {
+  for (const url of urls) {
+    try {
+      const parsed = new URL(url);
+      if (!["http:", "https:"].includes(parsed.protocol)) throw new Error("invalid protocol");
+    } catch {
+      throw new Error(`${label} phải là URL http/https hợp lệ.`);
+    }
+  }
+}
+
+function validatePostContent(payload) {
+  const allowedTypes = new Set(["status", "link", "photos", "video", "product"]);
+  if (!allowedTypes.has(payload.postType)) throw new Error("Loại bài đăng không được hỗ trợ.");
+
+  if (payload.postType === "photos") {
+    if (!payload.imageUrls.length) throw new Error("Cần nhập ít nhất một URL ảnh công khai.");
+    validateUrlList(payload.imageUrls, "URL ảnh");
+    return;
+  }
+
+  if (payload.postType === "product" && payload.imageUrls.length) {
+    validateUrlList(payload.imageUrls, "URL ảnh sản phẩm");
+  }
+
+  if (payload.postType === "video") {
+    if (!payload.videoUrl) throw new Error("Cần nhập URL video công khai.");
+    validateUrlList([payload.videoUrl], "URL video");
+    return;
+  }
+
+  const message = payload.postType === "product" ? buildProductMessage(payload) : payload.message;
+  if (!String(message || "").trim() && !String(payload.link || "").trim()) {
+    throw new Error("Cần nhập nội dung, liên kết, ảnh hoặc video.");
+  }
+}
+
+async function publishPhotoPost(pageId, page, imageUrls, message) {
+  if (imageUrls.length === 1) {
+    const body = {
+      access_token: page.access_token,
+      url: imageUrls[0]
+    };
+    if (message.trim()) body.caption = message;
+    return graphPost(`${pageId}/photos`, body);
+  }
+
+  const uploadedPhotos = [];
+  for (const imageUrl of imageUrls) {
+    const photo = await graphPost(`${pageId}/photos`, {
+      access_token: page.access_token,
+      url: imageUrl,
+      published: "false"
+    });
+    uploadedPhotos.push(photo.id);
+  }
+
+  const body = {
+    access_token: page.access_token,
+    message: message || ""
+  };
+  uploadedPhotos.forEach((id, index) => {
+    body[`attached_media[${index}]`] = JSON.stringify({ media_fbid: id });
+  });
+  return graphPost(`${pageId}/feed`, body);
+}
+
+async function publishPageContent(payload) {
+  assertSupportedDestination(payload);
+  validatePostContent(payload);
+  const pageId = payload.pageId;
   const page = await getPageById(pageId);
   if (!page) throw new Error("Không tìm thấy Page token. Hãy kết nối Facebook lại.");
-  if (!String(message || "").trim() && !String(link || "").trim()) {
-    throw new Error("Cần nhập nội dung hoặc liên kết.");
+
+  if (payload.postType === "photos") {
+    return publishPhotoPost(pageId, page, payload.imageUrls, payload.message);
+  }
+
+  if (payload.postType === "video") {
+    const body = {
+      access_token: page.access_token,
+      file_url: payload.videoUrl
+    };
+    if (payload.message.trim()) body.description = payload.message;
+    return graphPost(`${pageId}/videos`, body);
+  }
+
+  const message = payload.postType === "product" ? buildProductMessage(payload) : payload.message;
+  if (payload.postType === "product" && payload.imageUrls.length) {
+    return publishPhotoPost(pageId, page, payload.imageUrls, message);
   }
 
   const body = { access_token: page.access_token };
   if (String(message || "").trim()) body.message = message;
-  if (String(link || "").trim()) body.link = link;
+  if (String(payload.link || "").trim()) body.link = payload.link;
   return graphPost(`${pageId}/feed`, body);
 }
 
@@ -162,14 +301,14 @@ async function processDueJobs() {
     if (new Date(job.publishAt).getTime() > now) continue;
 
     try {
-      const result = await publishPagePost(job.pageId, job.message, job.link);
+      const result = await publishPageContent(normalizePostPayload(job));
       job.status = "published";
       job.publishedAt = new Date().toISOString();
-      job.facebookPostId = result.id;
+      job.facebookPostId = result.post_id || result.id;
       job.error = "";
       await addActivity("success", "Đã đăng bài theo lịch", {
         pageId: job.pageId,
-        postId: result.id
+        postId: job.facebookPostId
       });
     } catch (error) {
       job.status = "failed";
@@ -233,12 +372,14 @@ async function handleApi(req, res, url) {
 
   if (req.method === "POST" && route === "/api/posts") {
     const body = await readBody(req);
+    const payload = normalizePostPayload(body);
     try {
-      const result = await publishPagePost(body.pageId, body.message, body.link);
-      await addActivity("success", "Đã đăng bài", { pageId: body.pageId, postId: result.id });
-      return json(res, 200, { ok: true, postId: result.id });
+      const result = await publishPageContent(payload);
+      const postId = result.post_id || result.id;
+      await addActivity("success", "Đã đăng bài", { pageId: payload.pageId, postId, postType: payload.postType });
+      return json(res, 200, { ok: true, postId });
     } catch (error) {
-      await addActivity("error", "Đăng bài thất bại", { pageId: body.pageId, error: error.message });
+      await addActivity("error", "Đăng bài thất bại", { pageId: payload.pageId, postType: payload.postType, error: error.message });
       return json(res, 400, { error: error.message });
     }
   }
@@ -249,7 +390,15 @@ async function handleApi(req, res, url) {
 
   if (req.method === "POST" && route === "/api/jobs") {
     const body = await readBody(req);
-    const page = await getPageById(body.pageId);
+    const payload = normalizePostPayload(body);
+    try {
+      assertSupportedDestination(payload);
+      validatePostContent(payload);
+    } catch (error) {
+      return json(res, 400, { error: error.message });
+    }
+
+    const page = await getPageById(payload.pageId);
     if (!page) return json(res, 400, { error: "Không tìm thấy Page. Hãy kết nối Facebook lại." });
     if (!body.publishAt) return json(res, 400, { error: "Cần chọn thời gian đăng." });
 
@@ -258,8 +407,13 @@ async function handleApi(req, res, url) {
       id: crypto.randomUUID(),
       pageId: String(page.id),
       pageName: String(page.name),
-      message: String(body.message || ""),
-      link: String(body.link || ""),
+      destinationType: payload.destinationType,
+      postType: payload.postType,
+      message: payload.message,
+      link: payload.link,
+      imageUrls: payload.imageUrls,
+      videoUrl: payload.videoUrl,
+      product: payload.product,
       publishAt: new Date(body.publishAt).toISOString(),
       createdAt: new Date().toISOString(),
       publishedAt: "",
@@ -269,7 +423,7 @@ async function handleApi(req, res, url) {
     };
     jobs.push(job);
     await writeJson(paths.jobs, jobs);
-    await addActivity("info", "Đã lên lịch bài viết", { pageId: job.pageId, publishAt: job.publishAt });
+    await addActivity("info", "Đã lên lịch bài viết", { pageId: job.pageId, postType: job.postType, publishAt: job.publishAt });
     return json(res, 200, { ok: true, job });
   }
 
@@ -290,14 +444,14 @@ async function handleApi(req, res, url) {
     if (!job) return json(res, 404, { error: "Không tìm thấy lịch đăng" });
 
     try {
-      const result = await publishPagePost(job.pageId, job.message, job.link);
+      const result = await publishPageContent(normalizePostPayload(job));
       job.status = "published";
       job.publishedAt = new Date().toISOString();
-      job.facebookPostId = result.id;
+      job.facebookPostId = result.post_id || result.id;
       job.error = "";
       await writeJson(paths.jobs, jobs);
-      await addActivity("success", "Đã đăng thủ công bài đã lên lịch", { jobId, postId: result.id });
-      return json(res, 200, { ok: true, postId: result.id });
+      await addActivity("success", "Đã đăng thủ công bài đã lên lịch", { jobId, postId: job.facebookPostId });
+      return json(res, 200, { ok: true, postId: job.facebookPostId });
     } catch (error) {
       job.status = "failed";
       job.error = error.message;

@@ -28,14 +28,26 @@ const els = {
     activity: document.querySelector("#activityView")
   },
   pageSelect: document.querySelector("#pageSelect"),
+  destinationType: document.querySelector("#destinationType"),
+  unsupportedNotice: document.querySelector("#unsupportedNotice"),
+  postType: document.querySelector("#postType"),
   messageInput: document.querySelector("#messageInput"),
   linkInput: document.querySelector("#linkInput"),
+  imageUrlsInput: document.querySelector("#imageUrlsInput"),
+  videoUrlInput: document.querySelector("#videoUrlInput"),
+  productNameInput: document.querySelector("#productNameInput"),
+  productPriceInput: document.querySelector("#productPriceInput"),
+  productLocationInput: document.querySelector("#productLocationInput"),
+  productDescriptionInput: document.querySelector("#productDescriptionInput"),
+  contentFields: document.querySelectorAll(".content-field"),
   publishAtInput: document.querySelector("#publishAtInput"),
   composerForm: document.querySelector("#composerForm"),
   scheduleBtn: document.querySelector("#scheduleBtn"),
   previewPage: document.querySelector("#previewPage"),
+  previewKind: document.querySelector("#previewKind"),
   previewMessage: document.querySelector("#previewMessage"),
   previewLink: document.querySelector("#previewLink"),
+  previewMedia: document.querySelector("#previewMedia"),
   jobsTable: document.querySelector("#jobsTable"),
   reloadJobsBtn: document.querySelector("#reloadJobsBtn"),
   configForm: document.querySelector("#configForm"),
@@ -62,6 +74,14 @@ const viewMeta = {
     title: "Nhật ký",
     subtitle: "Theo dõi thao tác gần đây, kết quả đăng bài và lỗi Graph API."
   }
+};
+
+const postTypeLabels = {
+  status: "Status",
+  link: "Link",
+  photos: "Ảnh/album",
+  video: "Video",
+  product: "Sản phẩm"
 };
 
 function toast(message) {
@@ -151,7 +171,7 @@ function renderJobs() {
     .slice()
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .map((job) => {
-      const body = escapeHtml(job.message || job.link || "(empty)").slice(0, 140);
+      const body = escapeHtml(summarizePayload(job)).slice(0, 140);
       const time = formatDate(job.publishAt);
       const actions =
         job.status === "scheduled"
@@ -162,7 +182,7 @@ function renderJobs() {
         <td>${escapeHtml(job.pageName || job.pageId)}</td>
         <td>${time}</td>
         <td><span class="badge ${escapeHtml(job.status)}">${escapeHtml(formatStatus(job.status))}</span></td>
-        <td title="${escapeHtml(job.error || "")}">${body}</td>
+        <td title="${escapeHtml(job.error || "")}"><strong>${escapeHtml(formatPostType(job.postType))}</strong><br>${body}</td>
         <td>${actions}</td>
       </tr>`;
     })
@@ -186,15 +206,119 @@ function renderActivity() {
     .join("");
 }
 
+function getImageUrls() {
+  return els.imageUrlsInput.value
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function getProductPayload() {
+  return {
+    name: els.productNameInput.value.trim(),
+    price: els.productPriceInput.value.trim(),
+    location: els.productLocationInput.value.trim(),
+    description: els.productDescriptionInput.value.trim()
+  };
+}
+
+function buildProductMessage(payload) {
+  const parts = [];
+  if (payload.product.name) parts.push(payload.product.name);
+  if (payload.product.price) parts.push(`Giá: ${payload.product.price}`);
+  if (payload.product.location) parts.push(`Khu vực: ${payload.product.location}`);
+  if (payload.product.description) parts.push(payload.product.description);
+  if (payload.link) parts.push(payload.link);
+  if (String(payload.message || "").trim()) parts.push(String(payload.message || "").trim());
+  return parts.join("\n\n");
+}
+
+function buildPostPayload() {
+  const postType = els.postType.value;
+  return {
+    pageId: els.pageSelect.value,
+    destinationType: els.destinationType.value,
+    postType,
+    message: els.messageInput.value,
+    link: ["link", "product"].includes(postType) ? els.linkInput.value : "",
+    imageUrls: ["photos", "product"].includes(postType) ? getImageUrls() : [],
+    videoUrl: postType === "video" ? els.videoUrlInput.value : "",
+    product: postType === "product" ? getProductPayload() : {}
+  };
+}
+
+function updateComposerFields() {
+  const type = els.postType.value;
+  const visible = new Set();
+  if (type === "link") visible.add("link");
+  if (type === "photos") visible.add("photos");
+  if (type === "video") visible.add("video");
+  if (type === "product") {
+    visible.add("link");
+    visible.add("photos");
+    visible.add("product");
+  }
+
+  els.contentFields.forEach((field) => {
+    field.hidden = !visible.has(field.dataset.field);
+  });
+  els.unsupportedNotice.hidden = els.destinationType.value === "page";
+  updatePreview();
+}
+
+function summarizePayload(payload) {
+  if (payload.postType === "photos") {
+    return `${(payload.imageUrls || []).length} ảnh - ${payload.message || "Không có caption"}`;
+  }
+  if (payload.postType === "video") {
+    return payload.videoUrl || payload.message || "Video";
+  }
+  if (payload.postType === "product") {
+    return buildProductMessage({
+      ...payload,
+      product: payload.product || {}
+    }) || "Sản phẩm";
+  }
+  return payload.message || payload.link || "(trống)";
+}
+
+function formatPostType(value) {
+  return postTypeLabels[value || "status"] || value || "Status";
+}
+
+function resetComposer() {
+  els.messageInput.value = "";
+  els.linkInput.value = "";
+  els.imageUrlsInput.value = "";
+  els.videoUrlInput.value = "";
+  els.productNameInput.value = "";
+  els.productPriceInput.value = "";
+  els.productLocationInput.value = "";
+  els.productDescriptionInput.value = "";
+  updatePreview();
+}
+
 function updatePreview() {
   const page = state.pages.find((item) => item.id === els.pageSelect.value);
-  const message = els.messageInput.value.trim();
-  const link = els.linkInput.value.trim();
+  const payload = buildPostPayload();
+  const message = payload.postType === "product" ? buildProductMessage(payload) : payload.message.trim();
+  const link = payload.link.trim();
 
   els.previewPage.textContent = page ? page.name : "Chọn một Page";
+  els.previewKind.textContent = `${formatPostType(payload.postType)} · ${payload.destinationType === "page" ? "Page" : "Không hỗ trợ đăng trực tiếp"}`;
   els.previewMessage.textContent = message || "Bản xem trước bài viết sẽ hiện ở đây.";
   els.previewLink.hidden = !link;
   els.previewLink.textContent = link;
+
+  const media = [];
+  if (payload.postType === "photos" || payload.postType === "product") {
+    payload.imageUrls.forEach((url, index) => media.push(`Ảnh ${index + 1}: ${url}`));
+  }
+  if (payload.postType === "video" && payload.videoUrl.trim()) {
+    media.push(`Video: ${payload.videoUrl.trim()}`);
+  }
+  els.previewMedia.hidden = media.length === 0;
+  els.previewMedia.innerHTML = media.map((item) => `<div class="preview-media-item">${escapeHtml(item)}</div>`).join("");
 }
 
 async function loadStatus() {
@@ -248,27 +372,30 @@ async function saveConfig(event) {
 
 async function postNow(event) {
   event.preventDefault();
+  if (els.destinationType.value !== "page") {
+    toast("Chỉ hỗ trợ đăng trực tiếp lên Page qua Graph API chính thức.");
+    return;
+  }
   if (!els.pageSelect.value) {
     toast("Hãy kết nối và chọn Page trước.");
     return;
   }
 
+  const payload = buildPostPayload();
   await api("/api/posts", {
     method: "POST",
-    body: JSON.stringify({
-      pageId: els.pageSelect.value,
-      message: els.messageInput.value,
-      link: els.linkInput.value
-    })
+    body: JSON.stringify(payload)
   });
   toast("Đã đăng bài.");
-  els.messageInput.value = "";
-  els.linkInput.value = "";
-  updatePreview();
+  resetComposer();
   await Promise.all([loadJobs(), loadActivity()]);
 }
 
 async function schedulePost() {
+  if (els.destinationType.value !== "page") {
+    toast("Chỉ hỗ trợ lên lịch đăng trực tiếp lên Page qua Graph API chính thức.");
+    return;
+  }
   if (!els.pageSelect.value) {
     toast("Hãy kết nối và chọn Page trước.");
     return;
@@ -278,12 +405,11 @@ async function schedulePost() {
     return;
   }
 
+  const payload = buildPostPayload();
   await api("/api/jobs", {
     method: "POST",
     body: JSON.stringify({
-      pageId: els.pageSelect.value,
-      message: els.messageInput.value,
-      link: els.linkInput.value,
+      ...payload,
       publishAt: els.publishAtInput.value
     })
   });
@@ -356,8 +482,16 @@ els.composerForm.addEventListener("submit", (event) => postNow(event).catch((err
 els.scheduleBtn.addEventListener("click", () => schedulePost().catch((error) => toast(error.message)));
 els.jobsTable.addEventListener("click", (event) => handleJobsClick(event).catch((error) => toast(error.message)));
 els.pageSelect.addEventListener("change", updatePreview);
+els.destinationType.addEventListener("change", updateComposerFields);
+els.postType.addEventListener("change", updateComposerFields);
 els.messageInput.addEventListener("input", updatePreview);
 els.linkInput.addEventListener("input", updatePreview);
+els.imageUrlsInput.addEventListener("input", updatePreview);
+els.videoUrlInput.addEventListener("input", updatePreview);
+els.productNameInput.addEventListener("input", updatePreview);
+els.productPriceInput.addEventListener("input", updatePreview);
+els.productLocationInput.addEventListener("input", updatePreview);
+els.productDescriptionInput.addEventListener("input", updatePreview);
 els.copyRedirectBtn.addEventListener("click", async () => {
   await navigator.clipboard.writeText(els.redirectUriValue.textContent);
   toast("Đã copy Redirect URI.");
@@ -375,4 +509,5 @@ els.connectBtn.addEventListener("click", (event) => {
   }
 });
 
+updateComposerFields();
 refreshAll().catch((error) => toast(error.message));

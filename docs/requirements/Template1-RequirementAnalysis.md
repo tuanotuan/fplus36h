@@ -21,7 +21,7 @@ Based on the current FB Page Manager implementation, the main stakeholders are:
 | FR-02 | The app shall show setup state for Meta App configuration and Facebook connection. | Implemented |
 | FR-03 | The app shall support Facebook OAuth login. | Implemented |
 | FR-04 | The app shall load Pages managed by the connected Facebook account. | Implemented |
-| FR-05 | The app shall publish text/link posts to a selected Page. | Implemented |
+| FR-05 | The app shall publish status, link, photo, video, and product-style posts to a selected Page. | Implemented |
 | FR-06 | The app shall schedule posts locally. | Implemented |
 | FR-07 | The app shall show activity logs for success and failure events. | Implemented |
 | FR-08 | The app shall expose a health endpoint for deployment monitoring. | Implemented |
@@ -49,4 +49,5 @@ Based on the current FB Page Manager implementation, the main stakeholders are:
 * Browser automation, cookie harvesting, checkpoint bypass, UID scraping, or spam workflows.
 * Multi-tenant SaaS authentication.
 * Messenger automation.
-* Photo/video publishing.
+* Direct Facebook Group publishing without an official reviewed API path.
+* Direct Marketplace product publishing without an official reviewed API path.

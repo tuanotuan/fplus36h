@@ -7,9 +7,10 @@ A personal Facebook Page publishing dashboard built as a small web app. It uses 
 - Configure Meta app credentials through `.env` or the Settings screen.
 - Connect Facebook with OAuth.
 - Load Pages managed by the connected account.
-- Publish a text/link post to a Page.
-- Schedule local posts while the web server is running.
+- Publish status, link, photo/album, video, and product-style posts to a Page.
+- Schedule local Page posts while the web server is running.
 - Keep a local activity log.
+- Show unsupported Group and Marketplace destinations without adding browser automation or unofficial posting.
 
 ## Quick Start
 
@@ -69,6 +70,24 @@ pages_show_list
 pages_read_engagement
 pages_manage_posts
 ```
+
+## Supported Publishing Scope
+
+The app publishes only to Facebook Pages managed by the connected account through the official Meta Graph API.
+
+Supported Page post types:
+
+- Status text.
+- Website or Facebook link posts.
+- One image or multi-image album-style posts from public image URLs.
+- Video posts from a public video URL.
+- Product-style Page posts built from product name, price, location, description, optional link, and optional image URLs.
+
+Not supported:
+
+- Direct posting to Facebook groups.
+- Direct product publishing to Marketplace.
+- Username/password login, cookies, browser automation, checkpoint bypass, or mass-spam workflows.
 
 ## Project Structure
 

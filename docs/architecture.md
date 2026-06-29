@@ -41,9 +41,9 @@ The app is a single-service web application. The same Node process serves static
 
 ## Publishing Flow
 
-1. The browser submits a Page ID, message, and optional link to `/api/posts`.
+1. The browser submits a Page ID, destination type, post type, and content payload to `/api/posts`.
 2. The server finds the matching Page access token in `data/auth.json`.
-3. The server posts to `/{pageId}/feed` through Meta Graph API.
+3. The server publishes through Page feed, photo, or video Graph API endpoints depending on the post type.
 4. Success or failure is recorded in `data/activity.json`.
 
 ## Scheduling Flow
@@ -51,7 +51,7 @@ The app is a single-service web application. The same Node process serves static
 1. The browser submits a local publish time to `/api/jobs`.
 2. The server stores the job in `data/jobs.json` with status `scheduled`.
 3. A server interval checks due jobs every 30 seconds.
-4. Due jobs are published through the same Page feed flow.
+4. Due jobs are published through the same Page publishing flow.
 5. Jobs become `published` or `failed`.
 
 ## HTTP Boundaries

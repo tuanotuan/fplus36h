@@ -66,7 +66,39 @@ Response item:
 
 | Method | Path | Body / Result | Purpose |
 | --- | --- | --- | --- |
-| POST | `/api/posts` | `{ pageId, message, link? }` | Publish immediately to Page feed |
+| POST | `/api/posts` | Post payload | Publish immediately to a Page |
+
+Post payload:
+
+```json
+{
+  "pageId": "123",
+  "destinationType": "page",
+  "postType": "status",
+  "message": "Post text",
+  "link": "https://example.com",
+  "imageUrls": ["https://example.com/photo.jpg"],
+  "videoUrl": "https://example.com/video.mp4",
+  "product": {
+    "name": "Product name",
+    "price": "350.000đ",
+    "location": "TP.HCM",
+    "description": "Product condition and details"
+  }
+}
+```
+
+Supported `postType` values:
+
+| Type | Behavior |
+| --- | --- |
+| `status` | Publishes a Page feed post with `message` |
+| `link` | Publishes a Page feed post with `message` and `link` |
+| `photos` | Publishes one photo or an attached-media multi-photo Page post from public `imageUrls` |
+| `video` | Publishes a Page video from public `videoUrl` |
+| `product` | Builds a product-style Page post from `product`, optional `link`, optional `imageUrls`, and `message` |
+
+`destinationType` must be `page`. `group` and `marketplace` return validation errors because this app intentionally does not use unofficial browser automation and those destinations are not available through the required official API path for this personal app.
 
 Success:
 
@@ -88,7 +120,7 @@ Validation:
 | Method | Path | Body / Result | Purpose |
 | --- | --- | --- | --- |
 | GET | `/api/jobs` | `{ jobs: [...] }` | List local scheduled jobs |
-| POST | `/api/jobs` | `{ pageId, message, link?, publishAt }` | Create scheduled post |
+| POST | `/api/jobs` | Post payload plus `{ publishAt }` | Create scheduled post |
 | DELETE | `/api/jobs/:jobId` | `{ ok: true }` | Remove a job |
 | POST | `/api/jobs/:jobId/run` | `{ ok, postId }` | Publish a job immediately |
 
@@ -133,7 +165,8 @@ https://fplus36h.onrender.com/auth/callback
 | --- | --- |
 | OpenAPI/Swagger specification | Not Found |
 | Dashboard user authentication | Not Implemented |
-| Graph API photo/video upload endpoints | Not Implemented |
+| Direct Group publishing | Not Implemented |
+| Direct Marketplace product publishing | Not Implemented |
 | Webhook ingestion | Not Implemented |
 | Messenger inbox APIs | Not Implemented |
 | Bulk import CSV/API | Not Implemented |

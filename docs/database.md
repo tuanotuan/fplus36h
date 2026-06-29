@@ -73,8 +73,18 @@ Security note: `access_token` values must never be committed or shared.
     "id": "uuid",
     "pageId": "123",
     "pageName": "Example Page",
+    "destinationType": "page",
+    "postType": "photos",
     "message": "Post text",
     "link": "https://example.com",
+    "imageUrls": ["https://example.com/photo.jpg"],
+    "videoUrl": "",
+    "product": {
+      "name": "",
+      "price": "",
+      "location": "",
+      "description": ""
+    },
     "publishAt": "2026-06-29T10:00:00.000Z",
     "createdAt": "2026-06-29T09:00:00.000Z",
     "publishedAt": "",
@@ -86,6 +96,8 @@ Security note: `access_token` values must never be committed or shared.
 ```
 
 The in-process scheduler scans this file every 30 seconds. Jobs are rewritten after publish attempts.
+
+Older jobs that only contain `message` and `link` are still treated as Page feed posts.
 
 ## Activity Store
 

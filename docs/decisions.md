@@ -22,7 +22,7 @@ This file records architectural and operational decisions inferred from the curr
 | Rationale | Collecting passwords, browser automation, spam workflows, or checkpoint bypassing would be unsafe and unreliable. |
 | Alternatives Considered | Username/password login; cookie-based browser automation. Both were rejected. |
 | Decision | Use Facebook OAuth and Meta Graph API Page endpoints only. |
-| Consequences | Some FPlus-like automation features are intentionally out of scope; Meta permissions and app review may apply. |
+| Consequences | Some FPlus-like automation features are intentionally out of scope; direct Group and Marketplace publishing are not implemented unless Meta provides an official reviewed API path for this app. Meta permissions and app review may apply. |
 
 ## Single Node.js Web Service
 

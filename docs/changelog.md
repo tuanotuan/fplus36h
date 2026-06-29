@@ -4,6 +4,9 @@
 
 Added:
 
+* Added Page publishing support for status, link, public image URL, multi-image attached-media posts, public video URL posts, and product-style Page posts.
+* Added composer controls for destination type, post type, image URLs, video URL, and product details.
+* Added explicit UI/API validation for unsupported Group and Marketplace direct publishing so the app stays on official Meta Graph API behavior.
 * Created the FB Page Manager web app in `D:\fb-page-manager`.
 * Implemented a Node.js single-service runtime with static frontend, API routes, Facebook OAuth, Graph API Page listing, immediate publishing, scheduled publishing, and activity logs.
 * Added Docker, Docker Compose, Render Blueprint, health check, and GitHub Actions CI/deploy workflow.

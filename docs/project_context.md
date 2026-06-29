@@ -4,7 +4,7 @@
 
 FB Page Manager is a small personal web app for managing Facebook Page publishing through the official Meta Graph API. It is intentionally not a browser-automation or account-password tool.
 
-The app helps one operator connect a Meta app, authorize Facebook Pages, publish text/link posts, and keep lightweight local schedules and activity logs.
+The app helps one operator connect a Meta app, authorize Facebook Pages, publish status/link/photo/video/product-style Page posts, and keep lightweight local schedules and activity logs.
 
 ## Current State
 
@@ -13,7 +13,7 @@ The app helps one operator connect a Meta app, authorize Facebook Pages, publish
 | Frontend | Implemented plain HTML/CSS/JS dashboard with Vietnamese UI | `public/` |
 | Backend | Implemented Node.js HTTP server using only built-in modules | `src/server.js` |
 | Auth | Facebook OAuth login and callback flow | `/auth/login`, `/auth/callback` |
-| Graph API | Page listing and Page feed publishing | `src/server.js` |
+| Graph API | Page listing plus Page feed/photo/video publishing | `src/server.js` |
 | Storage | Local JSON files mounted as runtime data | `data/` |
 | Scheduler | In-process interval checks scheduled jobs | `src/server.js` |
 | DevOps | Docker, Compose, Render Blueprint, GitHub Actions | `Dockerfile`, `docker-compose.yml`, `render.yaml`, `.github/` |
@@ -41,7 +41,9 @@ The server owns the Facebook App Secret and exchanges OAuth codes for user/Page 
 | Save Meta App ID/App Secret locally or via environment | Implemented |
 | Facebook OAuth login | Implemented |
 | Read manageable Pages through `me/accounts` | Implemented |
-| Publish text/link posts to Page feed | Implemented |
+| Publish status/link posts to Page feed | Implemented |
+| Publish Page photos, multi-photo posts, and videos from public URLs | Implemented |
+| Publish product-style posts to a Page | Implemented |
 | Create local scheduled posts | Implemented |
 | Process due scheduled posts while the service is running | Implemented |
 | Activity log for local actions and API failures | Implemented |
@@ -66,7 +68,7 @@ The server owns the Facebook App Secret and exchanges OAuth codes for user/Page 
 | Permissions | Facebook Page permissions may require Meta app review outside tester/admin accounts |
 | Storage | JSON files are simple; no database or migrations |
 | Scheduling | No distributed worker, retry policy, or timezone-specific calendar view |
-| Media | Photo/video upload publishing is not implemented |
+| Group/Marketplace | Direct group posting and Marketplace product publishing are intentionally unsupported without an official API path for this app |
 | Operations | No central logs, metrics, backup, or secret rotation workflow |
 
 ## Validation Entry Points

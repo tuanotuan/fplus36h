@@ -89,14 +89,70 @@
               </div>
 
               <div class="field-row">
-                <label for="messageInput">Nội dung</label>
-                <textarea id="messageInput" rows="10" placeholder="Viết nội dung bài đăng..." required></textarea>
+                <label for="destinationType">Điểm đăng</label>
+                <select id="destinationType">
+                  <option value="page">Page quản lý qua Graph API</option>
+                  <option value="group">Nhóm Facebook (không hỗ trợ đăng trực tiếp)</option>
+                  <option value="marketplace">Marketplace (không hỗ trợ đăng trực tiếp)</option>
+                </select>
+              </div>
+
+              <div class="notice compact" id="unsupportedNotice" hidden>
+                Meta không còn mở API đăng trực tiếp lên nhóm cho app dạng này và Marketplace không có API đăng sản phẩm công khai. Ứng dụng chỉ đăng được lên Page bạn quản lý bằng quyền chính thức.
               </div>
 
               <div class="field-row">
+                <label for="postType">Loại bài</label>
+                <select id="postType">
+                  <option value="status">Status</option>
+                  <option value="link">Link website hoặc bài Facebook</option>
+                  <option value="photos">Ảnh hoặc album nhiều ảnh</option>
+                  <option value="video">Video</option>
+                  <option value="product">Sản phẩm trên Page</option>
+                </select>
+              </div>
+
+              <div class="field-row">
+                <label for="messageInput">Nội dung</label>
+                <textarea id="messageInput" rows="8" placeholder="Viết nội dung bài đăng..."></textarea>
+              </div>
+
+              <div class="field-row content-field" data-field="link">
                 <label for="linkInput">Liên kết</label>
                 <input id="linkInput" type="url" placeholder="https://example.com/article" />
               </div>
+
+              <div class="field-row content-field" data-field="photos">
+                <label for="imageUrlsInput">URL ảnh</label>
+                <textarea id="imageUrlsInput" rows="4" placeholder="Mỗi dòng một URL ảnh công khai"></textarea>
+              </div>
+
+              <div class="field-row content-field" data-field="video">
+                <label for="videoUrlInput">URL video</label>
+                <input id="videoUrlInput" type="url" placeholder="https://example.com/video.mp4" />
+              </div>
+
+              <fieldset class="product-fields content-field" data-field="product">
+                <legend>Thông tin sản phẩm</legend>
+                <div class="field-row">
+                  <label for="productNameInput">Tên sản phẩm</label>
+                  <input id="productNameInput" placeholder="Tên sản phẩm" />
+                </div>
+                <div class="field-grid">
+                  <div class="field-row">
+                    <label for="productPriceInput">Giá</label>
+                    <input id="productPriceInput" placeholder="Ví dụ: 350.000đ" />
+                  </div>
+                  <div class="field-row">
+                    <label for="productLocationInput">Khu vực</label>
+                    <input id="productLocationInput" placeholder="Ví dụ: Quận 1, TP.HCM" />
+                  </div>
+                </div>
+                <div class="field-row">
+                  <label for="productDescriptionInput">Mô tả sản phẩm</label>
+                  <textarea id="productDescriptionInput" rows="4" placeholder="Tình trạng, kích thước, bảo hành, cách liên hệ..."></textarea>
+                </div>
+              </fieldset>
 
               <div class="field-row">
                 <label for="publishAtInput">Lịch đăng</label>
@@ -115,8 +171,10 @@
 
             <section class="panel preview">
               <div class="preview-page" id="previewPage">Chọn một Page</div>
+              <div class="preview-kind" id="previewKind">Status</div>
               <div class="preview-message" id="previewMessage">Bản xem trước bài viết sẽ hiện ở đây.</div>
               <div class="preview-link" id="previewLink" hidden></div>
+              <div class="preview-media" id="previewMedia" hidden></div>
             </section>
           </div>
 
