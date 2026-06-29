@@ -424,6 +424,13 @@ function mime(filePath) {
 async function handle(req, res) {
   const url = new URL(req.url, baseUrl);
   try {
+    if (req.method === "GET" && url.pathname === "/health") {
+      return json(res, 200, {
+        ok: true,
+        service: "fb-page-manager",
+        at: new Date().toISOString()
+      });
+    }
     if (url.pathname.startsWith("/api/")) return await handleApi(req, res, url);
     if (url.pathname.startsWith("/auth/")) return await handleAuth(req, res, url);
     return await serveStatic(res, url.pathname);

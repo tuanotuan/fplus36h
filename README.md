@@ -11,7 +11,9 @@ A personal Facebook Page publishing dashboard built as a small web app. It uses 
 - Schedule local posts while the web server is running.
 - Keep a local activity log.
 
-## Run With Docker
+## Quick Start
+
+### Docker Compose
 
 Create your local env file:
 
@@ -32,12 +34,20 @@ Open:
 http://localhost:8787
 ```
 
-## Run With Node
+Health check:
 
-Install Node.js 20+ first, then:
+```text
+http://localhost:8787/health
+```
+
+### Local Node.js
+
+Install Node.js 24 first, then:
 
 ```powershell
 cd D:\fb-page-manager
+npm ci
+npm run check
 npm start
 ```
 
@@ -69,6 +79,8 @@ data/          Local runtime data, ignored by Git
 Dockerfile     Production container
 docker-compose.yml
 .env.example   Local environment template
+.github/       CI and Render deploy trigger
+docs/          Deployment notes
 ```
 
 ## Local Data
@@ -81,3 +93,7 @@ All runtime data is stored in `data/`:
 - `activity.json`: local logs.
 
 Do not share the `data/` folder or `.env`.
+
+## Deployment
+
+See `docs/deployment.md`.
