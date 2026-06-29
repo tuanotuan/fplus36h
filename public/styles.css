@@ -221,17 +221,80 @@ textarea {
 }
 
 .panel,
-.table-panel {
+.table-panel,
+.setup-panel {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 18px;
 }
 
+.setup-panel {
+  margin-bottom: 18px;
+}
+
+.setup-panel h3 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+.setup-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.setup-step {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: #f9fafb;
+}
+
+.setup-step.done {
+  border-color: #9ed8bc;
+  background: #eefaf3;
+}
+
+.setup-step strong,
+.setup-step span {
+  display: block;
+}
+
+.setup-step strong {
+  margin-bottom: 6px;
+}
+
+.setup-step span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .field-row {
   display: grid;
   gap: 8px;
   margin-bottom: 16px;
+}
+
+.notice {
+  border: 1px solid #b9c7dd;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  background: #f5f8ff;
+  color: #344054;
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 label {
@@ -463,7 +526,8 @@ th {
   }
 
   .topbar,
-  .editor-layout {
+  .editor-layout,
+  .setup-grid {
     grid-template-columns: 1fr;
     display: grid;
   }
@@ -489,7 +553,8 @@ th {
   }
 
   .top-actions,
-  .action-row {
+  .action-row,
+  .setup-actions {
     width: 100%;
   }
 }

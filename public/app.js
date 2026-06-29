@@ -13,6 +13,14 @@ const els = {
   viewSubtitle: document.querySelector("#viewSubtitle"),
   connectBtn: document.querySelector("#connectBtn"),
   refreshBtn: document.querySelector("#refreshBtn"),
+  setupPanel: document.querySelector("#setupPanel"),
+  setupMessage: document.querySelector("#setupMessage"),
+  setupCallback: document.querySelector("#setupCallback"),
+  stepConfig: document.querySelector("#stepConfig"),
+  stepCallback: document.querySelector("#stepCallback"),
+  stepConnect: document.querySelector("#stepConnect"),
+  openSettingsBtn: document.querySelector("#openSettingsBtn"),
+  copySetupCallbackBtn: document.querySelector("#copySetupCallbackBtn"),
   navItems: document.querySelectorAll(".nav-item"),
   views: {
     compose: document.querySelector("#composeView"),
@@ -93,6 +101,31 @@ function renderStatus(status) {
   els.connectBtn.toggleAttribute("aria-disabled", !status.configured);
   els.connectBtn.classList.toggle("secondary", status.configured);
   els.connectBtn.classList.toggle("ghost", !status.configured);
+  renderSetup(status);
+}
+
+function renderSetup(status) {
+  const ready = status.configured && status.connected && status.pageCount > 0;
+  els.setupPanel.hidden = ready;
+  els.setupCallback.textContent = status.redirectUri || "Callback URL unavailable.";
+
+  els.stepConfig.classList.toggle("done", status.configured);
+  els.stepCallback.classList.toggle("done", status.configured);
+  els.stepConnect.classList.toggle("done", status.connected);
+
+  if (!status.configured) {
+    els.setupMessage.textContent = "Add Facebook App ID and Secret before connecting Facebook.";
+    return;
+  }
+  if (!status.connected) {
+    els.setupMessage.textContent = "Meta credentials are ready. Add the callback URL in Facebook Login, then connect Facebook.";
+    return;
+  }
+  if (status.pageCount === 0) {
+    els.setupMessage.textContent = "Facebook is connected, but no manageable Pages were returned.";
+    return;
+  }
+  els.setupMessage.textContent = "Setup complete. Choose a Page and publish.";
 }
 
 function renderPages() {
@@ -313,6 +346,11 @@ els.copyRedirectBtn.addEventListener("click", async () => {
   await navigator.clipboard.writeText(els.redirectUriValue.textContent);
   toast("Redirect URI copied.");
 });
+els.copySetupCallbackBtn.addEventListener("click", async () => {
+  await navigator.clipboard.writeText(state.status?.redirectUri || els.redirectUriValue.textContent);
+  toast("Callback URL copied.");
+});
+els.openSettingsBtn.addEventListener("click", () => switchView("settings"));
 els.connectBtn.addEventListener("click", (event) => {
   if (!state.status?.configured) {
     event.preventDefault();

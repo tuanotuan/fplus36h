@@ -52,6 +52,33 @@
         </section>
 
         <section class="view active" id="composeView">
+          <section class="setup-panel" id="setupPanel" hidden>
+            <div>
+              <h3>Setup checklist</h3>
+              <p id="setupMessage">Finish the Meta app setup before connecting Facebook.</p>
+            </div>
+            <div class="setup-grid">
+              <div class="setup-step" id="stepConfig">
+                <strong>1. Add app credentials</strong>
+                <span>Set Facebook App ID and Secret in Render environment or Settings.</span>
+              </div>
+              <div class="setup-step" id="stepCallback">
+                <strong>2. Add OAuth callback</strong>
+                <span id="setupCallback">Loading callback URL...</span>
+              </div>
+              <div class="setup-step" id="stepConnect">
+                <strong>3. Connect Facebook</strong>
+                <span>Grant Page permissions, then choose a Page below.</span>
+              </div>
+            </div>
+            <div class="setup-actions">
+              <button class="button primary" type="button" id="openSettingsBtn">Open settings</button>
+              <button class="button secondary" type="button" id="copySetupCallbackBtn">Copy callback</button>
+              <a class="button ghost" href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer">Meta apps</a>
+              <a class="button ghost" href="https://dashboard.render.com/" target="_blank" rel="noreferrer">Render env</a>
+            </div>
+          </section>
+
           <div class="editor-layout">
             <form class="panel composer" id="composerForm">
               <div class="field-row">
@@ -119,13 +146,16 @@
 
         <section class="view" id="settingsView">
           <form class="panel settings-form" id="configForm">
+            <div class="notice" id="settingsNotice">
+              Use Render environment variables for production. The form below is handy for local runs and quick testing.
+            </div>
             <div class="field-row">
               <label for="appIdInput">Facebook App ID</label>
-              <input id="appIdInput" autocomplete="off" required />
+              <input id="appIdInput" autocomplete="off" placeholder="Paste App ID from Meta for Developers" required />
             </div>
             <div class="field-row">
               <label for="appSecretInput">Facebook App Secret</label>
-              <input id="appSecretInput" type="password" autocomplete="off" required />
+              <input id="appSecretInput" type="password" autocomplete="off" placeholder="Paste App Secret" required />
             </div>
             <div class="field-row">
               <label for="graphVersionInput">Graph API version</label>
@@ -136,6 +166,13 @@
               <div class="copy-line">
                 <code id="redirectUriValue">http://localhost:8787/auth/callback</code>
                 <button class="button ghost" type="button" id="copyRedirectBtn">Copy</button>
+              </div>
+            </div>
+            <div class="field-row">
+              <label>Meta dashboard</label>
+              <div class="copy-line">
+                <a class="button secondary" href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer">Open Meta apps</a>
+                <a class="button ghost" href="https://dashboard.render.com/" target="_blank" rel="noreferrer">Open Render env</a>
               </div>
             </div>
             <div class="action-row">
