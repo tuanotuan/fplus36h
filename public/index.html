@@ -13,7 +13,7 @@
           <div class="brand-mark">f</div>
           <div>
             <h1>FB Page Manager</h1>
-            <p>Personal Page publishing</p>
+            <p>Quản lý đăng bài Page cá nhân</p>
           </div>
         </div>
 
@@ -33,49 +33,49 @@
         </div>
 
         <nav class="nav">
-          <button class="nav-item active" data-tab="compose">Compose</button>
-          <button class="nav-item" data-tab="settings">Settings</button>
-          <button class="nav-item" data-tab="activity">Activity</button>
+          <button class="nav-item active" data-tab="compose">Soạn bài</button>
+          <button class="nav-item" data-tab="settings">Cài đặt</button>
+          <button class="nav-item" data-tab="activity">Nhật ký</button>
         </nav>
       </aside>
 
       <main class="workspace">
         <section class="topbar">
           <div>
-            <h2 id="viewTitle">Compose</h2>
-            <p id="viewSubtitle">Post now or schedule a Page post from your local machine.</p>
+            <h2 id="viewTitle">Soạn bài</h2>
+            <p id="viewSubtitle">Đăng ngay hoặc lên lịch bài viết cho Page.</p>
           </div>
           <div class="top-actions">
-            <a class="button secondary" href="/auth/login" id="connectBtn">Connect Facebook</a>
-            <button class="button ghost" id="refreshBtn">Refresh</button>
+            <a class="button secondary" href="/auth/login" id="connectBtn">Kết nối Facebook</a>
+            <button class="button ghost" id="refreshBtn">Làm mới</button>
           </div>
         </section>
 
         <section class="view active" id="composeView">
           <section class="setup-panel" id="setupPanel" hidden>
             <div>
-              <h3>Setup checklist</h3>
-              <p id="setupMessage">Finish the Meta app setup before connecting Facebook.</p>
+              <h3>Checklist thiết lập</h3>
+              <p id="setupMessage">Hoàn tất thiết lập Meta App trước khi kết nối Facebook.</p>
             </div>
             <div class="setup-grid">
               <div class="setup-step" id="stepConfig">
-                <strong>1. Add app credentials</strong>
-                <span>Set Facebook App ID and Secret in Render environment or Settings.</span>
+                <strong>1. Thêm thông tin app</strong>
+                <span>Điền Facebook App ID và App Secret trong Render Environment hoặc Cài đặt.</span>
               </div>
               <div class="setup-step" id="stepCallback">
-                <strong>2. Add OAuth callback</strong>
-                <span id="setupCallback">Loading callback URL...</span>
+                <strong>2. Thêm OAuth callback</strong>
+                <span id="setupCallback">Đang tải callback URL...</span>
               </div>
               <div class="setup-step" id="stepConnect">
-                <strong>3. Connect Facebook</strong>
-                <span>Grant Page permissions, then choose a Page below.</span>
+                <strong>3. Kết nối Facebook</strong>
+                <span>Cấp quyền Page, sau đó chọn Page bên dưới.</span>
               </div>
             </div>
             <div class="setup-actions">
-              <button class="button primary" type="button" id="openSettingsBtn">Open settings</button>
-              <button class="button secondary" type="button" id="copySetupCallbackBtn">Copy callback</button>
-              <a class="button ghost" href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer">Meta apps</a>
-              <a class="button ghost" href="https://dashboard.render.com/" target="_blank" rel="noreferrer">Render env</a>
+              <button class="button primary" type="button" id="openSettingsBtn">Mở cài đặt</button>
+              <button class="button secondary" type="button" id="copySetupCallbackBtn">Sao chép callback</button>
+              <a class="button ghost" href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer">Meta Apps</a>
+              <a class="button ghost" href="https://dashboard.render.com/" target="_blank" rel="noreferrer">Render Env</a>
             </div>
           </section>
 
@@ -84,60 +84,60 @@
               <div class="field-row">
                 <label for="pageSelect">Page</label>
                 <select id="pageSelect" required>
-                  <option value="">No Page connected</option>
+                  <option value="">Chưa kết nối Page</option>
                 </select>
               </div>
 
               <div class="field-row">
-                <label for="messageInput">Content</label>
-                <textarea id="messageInput" rows="10" placeholder="Write your Page post..." required></textarea>
+                <label for="messageInput">Nội dung</label>
+                <textarea id="messageInput" rows="10" placeholder="Viết nội dung bài đăng..." required></textarea>
               </div>
 
               <div class="field-row">
-                <label for="linkInput">Link</label>
+                <label for="linkInput">Liên kết</label>
                 <input id="linkInput" type="url" placeholder="https://example.com/article" />
               </div>
 
               <div class="field-row">
-                <label for="publishAtInput">Schedule</label>
+                <label for="publishAtInput">Lịch đăng</label>
                 <input id="publishAtInput" type="datetime-local" />
               </div>
 
               <div class="action-row">
-                <button class="button primary" type="submit" data-mode="now">Post now</button>
-                <button class="button secondary" type="button" id="scheduleBtn">Schedule</button>
+                <button class="button primary" type="submit" data-mode="now">Đăng ngay</button>
+                <button class="button secondary" type="button" id="scheduleBtn">Lên lịch</button>
               </div>
 
               <p class="hint">
-                Works with Pages you manage through official Meta permissions. Keep Facebook Login in Development mode for your own tester/admin account.
+                Ứng dụng dùng quyền chính thức của Meta cho các Page bạn quản lý. Khi đang thử nghiệm, hãy để Facebook Login ở Development mode và thêm tài khoản của bạn làm admin/developer/tester.
               </p>
             </form>
 
             <section class="panel preview">
-              <div class="preview-page" id="previewPage">Select a Page</div>
-              <div class="preview-message" id="previewMessage">Your post preview will appear here.</div>
+              <div class="preview-page" id="previewPage">Chọn một Page</div>
+              <div class="preview-message" id="previewMessage">Bản xem trước bài viết sẽ hiện ở đây.</div>
               <div class="preview-link" id="previewLink" hidden></div>
             </section>
           </div>
 
           <section class="table-panel">
             <div class="section-head">
-              <h3>Scheduled posts</h3>
-              <button class="icon-button" id="reloadJobsBtn" title="Reload">Refresh</button>
+              <h3>Bài đã lên lịch</h3>
+              <button class="icon-button" id="reloadJobsBtn" title="Tải lại">Làm mới</button>
             </div>
             <div class="table-wrap">
               <table>
                 <thead>
                   <tr>
                     <th>Page</th>
-                    <th>Time</th>
-                    <th>Status</th>
-                    <th>Post</th>
+                    <th>Thời gian</th>
+                    <th>Trạng thái</th>
+                    <th>Bài viết</th>
                     <th></th>
                   </tr>
                 </thead>
                 <tbody id="jobsTable">
-                  <tr><td colspan="5" class="empty">No scheduled posts yet.</td></tr>
+                  <tr><td colspan="5" class="empty">Chưa có bài lên lịch.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -147,46 +147,46 @@
         <section class="view" id="settingsView">
           <form class="panel settings-form" id="configForm">
             <div class="notice" id="settingsNotice">
-              Use Render environment variables for production. The form below is handy for local runs and quick testing.
+              Khi chạy production trên Render, nên đặt biến môi trường trong Render. Form bên dưới tiện cho chạy local hoặc test nhanh.
             </div>
             <div class="field-row">
               <label for="appIdInput">Facebook App ID</label>
-              <input id="appIdInput" autocomplete="off" placeholder="Paste App ID from Meta for Developers" required />
+              <input id="appIdInput" autocomplete="off" placeholder="Dán App ID từ Meta for Developers" required />
             </div>
             <div class="field-row">
               <label for="appSecretInput">Facebook App Secret</label>
-              <input id="appSecretInput" type="password" autocomplete="off" placeholder="Paste App Secret" required />
+              <input id="appSecretInput" type="password" autocomplete="off" placeholder="Dán App Secret" required />
             </div>
             <div class="field-row">
-              <label for="graphVersionInput">Graph API version</label>
+              <label for="graphVersionInput">Phiên bản Graph API</label>
               <input id="graphVersionInput" placeholder="v23.0" required />
             </div>
             <div class="field-row">
               <label>OAuth redirect URI</label>
               <div class="copy-line">
                 <code id="redirectUriValue">http://localhost:8787/auth/callback</code>
-                <button class="button ghost" type="button" id="copyRedirectBtn">Copy</button>
+                <button class="button ghost" type="button" id="copyRedirectBtn">Sao chép</button>
               </div>
             </div>
             <div class="field-row">
-              <label>Meta dashboard</label>
+              <label>Dashboard</label>
               <div class="copy-line">
-                <a class="button secondary" href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer">Open Meta apps</a>
-                <a class="button ghost" href="https://dashboard.render.com/" target="_blank" rel="noreferrer">Open Render env</a>
+                <a class="button secondary" href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer">Mở Meta Apps</a>
+                <a class="button ghost" href="https://dashboard.render.com/" target="_blank" rel="noreferrer">Mở Render Env</a>
               </div>
             </div>
             <div class="action-row">
-              <button class="button primary" type="submit">Save config</button>
+              <button class="button primary" type="submit">Lưu cấu hình</button>
             </div>
           </form>
 
           <section class="panel notes">
-            <h3>Meta setup</h3>
+            <h3>Thiết lập Meta</h3>
             <ol>
-              <li>Create a Meta app, add Facebook Login, and add the redirect URI above.</li>
-              <li>Use your own Facebook account as an app admin, developer, or tester.</li>
-              <li>Request/use Page permissions: <code>pages_show_list</code>, <code>pages_read_engagement</code>, <code>pages_manage_posts</code>.</li>
-              <li>Connect Facebook, then pick a Page in Compose.</li>
+              <li>Tạo Meta app, thêm Facebook Login, rồi thêm redirect URI ở trên.</li>
+              <li>Dùng tài khoản Facebook của bạn làm admin, developer hoặc tester của app.</li>
+              <li>Dùng các quyền Page: <code>pages_show_list</code>, <code>pages_read_engagement</code>, <code>pages_manage_posts</code>.</li>
+              <li>Kết nối Facebook, sau đó chọn Page ở màn Soạn bài.</li>
             </ol>
           </section>
         </section>
@@ -194,8 +194,8 @@
         <section class="view" id="activityView">
           <section class="table-panel">
             <div class="section-head">
-              <h3>Activity log</h3>
-              <button class="icon-button" id="reloadActivityBtn" title="Reload">Refresh</button>
+              <h3>Nhật ký hoạt động</h3>
+              <button class="icon-button" id="reloadActivityBtn" title="Tải lại">Làm mới</button>
             </div>
             <div id="activityList" class="activity-list"></div>
           </section>

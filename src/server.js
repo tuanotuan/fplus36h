@@ -128,7 +128,7 @@ async function graphFetch(url, options) {
   const text = await response.text();
   const data = text ? JSON.parse(text) : {};
   if (!response.ok) {
-    const message = data.error?.message || `Graph API failed with HTTP ${response.status}`;
+    const message = data.error?.message || `Graph API lỗi HTTP ${response.status}`;
     throw new Error(message);
   }
   return data;
@@ -141,9 +141,9 @@ async function getPageById(pageId) {
 
 async function publishPagePost(pageId, message, link) {
   const page = await getPageById(pageId);
-  if (!page) throw new Error("Page token not found. Connect Facebook again.");
+  if (!page) throw new Error("Không tìm thấy Page token. Hãy kết nối Facebook lại.");
   if (!String(message || "").trim() && !String(link || "").trim()) {
-    throw new Error("Message or link is required.");
+    throw new Error("Cần nhập nội dung hoặc liên kết.");
   }
 
   const body = { access_token: page.access_token };
@@ -167,14 +167,14 @@ async function processDueJobs() {
       job.publishedAt = new Date().toISOString();
       job.facebookPostId = result.id;
       job.error = "";
-      await addActivity("success", "Scheduled post published", {
+      await addActivity("success", "Đã đăng bài theo lịch", {
         pageId: job.pageId,
         postId: result.id
       });
     } catch (error) {
       job.status = "failed";
       job.error = error.message;
-      await addActivity("error", "Scheduled post failed", {
+      await addActivity("error", "Đăng bài theo lịch thất bại", {
         pageId: job.pageId,
         error: error.message
       });
@@ -221,7 +221,7 @@ async function handleApi(req, res, url) {
       redirectUri: `${baseUrl}/auth/callback`
     };
     await writeJson(paths.config, config);
-    await addActivity("info", "Config updated", { graphVersion: config.graphVersion });
+    await addActivity("info", "Đã cập nhật cấu hình", { graphVersion: config.graphVersion });
     return json(res, 200, { ok: true, redirectUri: config.redirectUri });
   }
 
@@ -235,10 +235,10 @@ async function handleApi(req, res, url) {
     const body = await readBody(req);
     try {
       const result = await publishPagePost(body.pageId, body.message, body.link);
-      await addActivity("success", "Post published", { pageId: body.pageId, postId: result.id });
+      await addActivity("success", "Đã đăng bài", { pageId: body.pageId, postId: result.id });
       return json(res, 200, { ok: true, postId: result.id });
     } catch (error) {
-      await addActivity("error", "Post failed", { pageId: body.pageId, error: error.message });
+      await addActivity("error", "Đăng bài thất bại", { pageId: body.pageId, error: error.message });
       return json(res, 400, { error: error.message });
     }
   }
@@ -250,8 +250,8 @@ async function handleApi(req, res, url) {
   if (req.method === "POST" && route === "/api/jobs") {
     const body = await readBody(req);
     const page = await getPageById(body.pageId);
-    if (!page) return json(res, 400, { error: "Page not found. Connect Facebook again." });
-    if (!body.publishAt) return json(res, 400, { error: "Publish time is required." });
+    if (!page) return json(res, 400, { error: "Không tìm thấy Page. Hãy kết nối Facebook lại." });
+    if (!body.publishAt) return json(res, 400, { error: "Cần chọn thời gian đăng." });
 
     const jobs = await readJson(paths.jobs, []);
     const job = {
@@ -269,7 +269,7 @@ async function handleApi(req, res, url) {
     };
     jobs.push(job);
     await writeJson(paths.jobs, jobs);
-    await addActivity("info", "Post scheduled", { pageId: job.pageId, publishAt: job.publishAt });
+    await addActivity("info", "Đã lên lịch bài viết", { pageId: job.pageId, publishAt: job.publishAt });
     return json(res, 200, { ok: true, job });
   }
 
@@ -278,7 +278,7 @@ async function handleApi(req, res, url) {
     const jobId = deleteMatch[1];
     const jobs = await readJson(paths.jobs, []);
     await writeJson(paths.jobs, jobs.filter((job) => job.id !== jobId));
-    await addActivity("info", "Scheduled job removed", { jobId });
+    await addActivity("info", "Đã xóa lịch đăng", { jobId });
     return json(res, 200, { ok: true });
   }
 
@@ -287,7 +287,7 @@ async function handleApi(req, res, url) {
     const jobId = runMatch[1];
     const jobs = await readJson(paths.jobs, []);
     const job = jobs.find((item) => item.id === jobId);
-    if (!job) return json(res, 404, { error: "Job not found" });
+    if (!job) return json(res, 404, { error: "Không tìm thấy lịch đăng" });
 
     try {
       const result = await publishPagePost(job.pageId, job.message, job.link);
@@ -296,13 +296,13 @@ async function handleApi(req, res, url) {
       job.facebookPostId = result.id;
       job.error = "";
       await writeJson(paths.jobs, jobs);
-      await addActivity("success", "Scheduled job published manually", { jobId, postId: result.id });
+      await addActivity("success", "Đã đăng thủ công bài đã lên lịch", { jobId, postId: result.id });
       return json(res, 200, { ok: true, postId: result.id });
     } catch (error) {
       job.status = "failed";
       job.error = error.message;
       await writeJson(paths.jobs, jobs);
-      await addActivity("error", "Manual publish failed", { jobId, error: error.message });
+      await addActivity("error", "Đăng thủ công thất bại", { jobId, error: error.message });
       return json(res, 400, { error: error.message });
     }
   }
@@ -312,13 +312,13 @@ async function handleApi(req, res, url) {
     return json(res, 200, { activity: activity.slice(-80) });
   }
 
-  return json(res, 404, { error: "API route not found" });
+  return json(res, 404, { error: "Không tìm thấy API route" });
 }
 
 async function handleAuth(req, res, url) {
   const config = await getConfig();
   if (!config.facebookAppId || !config.facebookAppSecret) {
-    return send(res, 400, "Configure Facebook App ID and App Secret first.");
+    return send(res, 400, "Hãy cấu hình Facebook App ID và App Secret trước.");
   }
 
   if (url.pathname === "/auth/login") {
@@ -341,11 +341,11 @@ async function handleAuth(req, res, url) {
     const denied = url.searchParams.get("error_reason") || "";
 
     if (denied) {
-      await addActivity("error", "Facebook login denied", { reason: denied });
-      return send(res, 400, `Facebook login denied: ${denied}`);
+      await addActivity("error", "Facebook từ chối đăng nhập", { reason: denied });
+      return send(res, 400, `Facebook từ chối đăng nhập: ${denied}`);
     }
     if (!code || actualState !== expectedState.trim()) {
-      return send(res, 400, "Invalid OAuth callback.");
+      return send(res, 400, "OAuth callback không hợp lệ.");
     }
 
     try {
@@ -384,27 +384,27 @@ async function handleAuth(req, res, url) {
         pages,
         connectedAt: new Date().toISOString()
       });
-      await addActivity("success", "Facebook connected", { pageCount: pages.length });
+      await addActivity("success", "Đã kết nối Facebook", { pageCount: pages.length });
       return redirect(res, "/?connected=1");
     } catch (error) {
-      await addActivity("error", "Facebook connection failed", { error: error.message });
-      return send(res, 500, `Facebook connection failed: ${error.message}`);
+      await addActivity("error", "Kết nối Facebook thất bại", { error: error.message });
+      return send(res, 500, `Kết nối Facebook thất bại: ${error.message}`);
     }
   }
 
-  return json(res, 404, { error: "Auth route not found" });
+  return json(res, 404, { error: "Không tìm thấy Auth route" });
 }
 
 async function serveStatic(res, pathname) {
   const requested = pathname === "/" ? "/index.html" : pathname;
   const filePath = path.resolve(publicDir, `.${decodeURIComponent(requested)}`);
-  if (!filePath.startsWith(publicDir)) return json(res, 403, { error: "Forbidden" });
+  if (!filePath.startsWith(publicDir)) return json(res, 403, { error: "Không được phép truy cập" });
 
   try {
     const data = await fs.readFile(filePath);
     return send(res, 200, data, mime(filePath));
   } catch {
-    return json(res, 404, { error: "Not found" });
+    return json(res, 404, { error: "Không tìm thấy" });
   }
 }
 
@@ -436,14 +436,14 @@ async function handle(req, res) {
     if (url.pathname.startsWith("/auth/")) return await handleAuth(req, res, url);
     return await serveStatic(res, url.pathname);
   } catch (error) {
-    await addActivity("error", "Request failed", { path: url.pathname, error: error.message });
+    await addActivity("error", "Yêu cầu thất bại", { path: url.pathname, error: error.message });
     return json(res, 500, { error: error.message });
   }
 }
 
 async function main() {
   await ensureStores();
-  await addActivity("info", "Server started", { port });
+  await addActivity("info", "Server đã khởi động", { port });
 
   setInterval(() => {
     processDueJobs().catch((error) => {

@@ -51,16 +51,16 @@ const els = {
 
 const viewMeta = {
   compose: {
-    title: "Compose",
-    subtitle: "Post now or schedule a Page post from your local machine."
+    title: "Soạn bài",
+    subtitle: "Đăng ngay hoặc lên lịch bài viết cho Page."
   },
   settings: {
-    title: "Settings",
-    subtitle: "Configure your Meta app and OAuth redirect."
+    title: "Cài đặt",
+    subtitle: "Cấu hình Meta App và OAuth redirect."
   },
   activity: {
-    title: "Activity",
-    subtitle: "Recent local actions, publish results, and Graph API errors."
+    title: "Nhật ký",
+    subtitle: "Theo dõi thao tác gần đây, kết quả đăng bài và lỗi Graph API."
   }
 };
 
@@ -79,7 +79,7 @@ async function api(path, options = {}) {
   const text = await response.text();
   const data = text ? JSON.parse(text) : {};
   if (!response.ok) {
-    throw new Error(data.error || `Request failed: ${response.status}`);
+    throw new Error(data.error || `Yêu cầu thất bại: ${response.status}`);
   }
   return data;
 }
@@ -95,8 +95,8 @@ function switchView(name) {
 
 function renderStatus(status) {
   state.status = status;
-  els.configuredState.textContent = status.configured ? "Ready" : "Missing";
-  els.connectedState.textContent = status.connected ? "Connected" : "Not connected";
+  els.configuredState.textContent = status.configured ? "Sẵn sàng" : "Thiếu";
+  els.connectedState.textContent = status.connected ? "Đã kết nối" : "Chưa kết nối";
   els.pageCount.textContent = status.pageCount;
   els.connectBtn.toggleAttribute("aria-disabled", !status.configured);
   els.connectBtn.classList.toggle("secondary", status.configured);
@@ -107,30 +107,30 @@ function renderStatus(status) {
 function renderSetup(status) {
   const ready = status.configured && status.connected && status.pageCount > 0;
   els.setupPanel.hidden = ready;
-  els.setupCallback.textContent = status.redirectUri || "Callback URL unavailable.";
+  els.setupCallback.textContent = status.redirectUri || "Chưa lấy được callback URL.";
 
   els.stepConfig.classList.toggle("done", status.configured);
   els.stepCallback.classList.toggle("done", status.configured);
   els.stepConnect.classList.toggle("done", status.connected);
 
   if (!status.configured) {
-    els.setupMessage.textContent = "Add Facebook App ID and Secret before connecting Facebook.";
+    els.setupMessage.textContent = "Thêm Facebook App ID và App Secret trước khi kết nối Facebook.";
     return;
   }
   if (!status.connected) {
-    els.setupMessage.textContent = "Meta credentials are ready. Add the callback URL in Facebook Login, then connect Facebook.";
+    els.setupMessage.textContent = "Thông tin Meta App đã sẵn sàng. Thêm callback URL trong Facebook Login, rồi kết nối Facebook.";
     return;
   }
   if (status.pageCount === 0) {
-    els.setupMessage.textContent = "Facebook is connected, but no manageable Pages were returned.";
+    els.setupMessage.textContent = "Facebook đã kết nối, nhưng chưa lấy được Page nào bạn quản lý.";
     return;
   }
-  els.setupMessage.textContent = "Setup complete. Choose a Page and publish.";
+  els.setupMessage.textContent = "Thiết lập xong. Chọn Page và bắt đầu đăng bài.";
 }
 
 function renderPages() {
   if (!state.pages.length) {
-    els.pageSelect.innerHTML = `<option value="">No Page connected</option>`;
+    els.pageSelect.innerHTML = `<option value="">Chưa kết nối Page</option>`;
     updatePreview();
     return;
   }
@@ -143,7 +143,7 @@ function renderPages() {
 
 function renderJobs() {
   if (!state.jobs.length) {
-    els.jobsTable.innerHTML = `<tr><td colspan="5" class="empty">No scheduled posts yet.</td></tr>`;
+    els.jobsTable.innerHTML = `<tr><td colspan="5" class="empty">Chưa có bài lên lịch.</td></tr>`;
     return;
   }
 
@@ -155,13 +155,13 @@ function renderJobs() {
       const time = formatDate(job.publishAt);
       const actions =
         job.status === "scheduled"
-          ? `<button class="button ghost" data-run="${job.id}">Run</button>
-             <button class="button ghost" data-delete="${job.id}">Delete</button>`
-          : `<button class="button ghost" data-delete="${job.id}">Delete</button>`;
+          ? `<button class="button ghost" data-run="${job.id}">Đăng</button>
+             <button class="button ghost" data-delete="${job.id}">Xóa</button>`
+          : `<button class="button ghost" data-delete="${job.id}">Xóa</button>`;
       return `<tr>
         <td>${escapeHtml(job.pageName || job.pageId)}</td>
         <td>${time}</td>
-        <td><span class="badge ${escapeHtml(job.status)}">${escapeHtml(job.status)}</span></td>
+        <td><span class="badge ${escapeHtml(job.status)}">${escapeHtml(formatStatus(job.status))}</span></td>
         <td title="${escapeHtml(job.error || "")}">${body}</td>
         <td>${actions}</td>
       </tr>`;
@@ -171,7 +171,7 @@ function renderJobs() {
 
 function renderActivity() {
   if (!state.activity.length) {
-    els.activityList.innerHTML = `<div class="empty">No activity yet.</div>`;
+    els.activityList.innerHTML = `<div class="empty">Chưa có nhật ký.</div>`;
     return;
   }
 
@@ -179,7 +179,7 @@ function renderActivity() {
     .slice()
     .reverse()
     .map((item) => `<article class="activity-item">
-      <div class="activity-type ${escapeHtml(item.type)}">${escapeHtml(item.type)}</div>
+      <div class="activity-type ${escapeHtml(item.type)}">${escapeHtml(formatActivityType(item.type))}</div>
       <div>${escapeHtml(item.message)}</div>
       <div class="activity-time">${formatDate(item.at)}</div>
     </article>`)
@@ -191,8 +191,8 @@ function updatePreview() {
   const message = els.messageInput.value.trim();
   const link = els.linkInput.value.trim();
 
-  els.previewPage.textContent = page ? page.name : "Select a Page";
-  els.previewMessage.textContent = message || "Your post preview will appear here.";
+  els.previewPage.textContent = page ? page.name : "Chọn một Page";
+  els.previewMessage.textContent = message || "Bản xem trước bài viết sẽ hiện ở đây.";
   els.previewLink.hidden = !link;
   els.previewLink.textContent = link;
 }
@@ -242,14 +242,14 @@ async function saveConfig(event) {
       graphVersion: els.graphVersionInput.value
     })
   });
-  toast("Config saved.");
+  toast("Đã lưu cấu hình.");
   await refreshAll();
 }
 
 async function postNow(event) {
   event.preventDefault();
   if (!els.pageSelect.value) {
-    toast("Connect and select a Page first.");
+    toast("Hãy kết nối và chọn Page trước.");
     return;
   }
 
@@ -261,7 +261,7 @@ async function postNow(event) {
       link: els.linkInput.value
     })
   });
-  toast("Post published.");
+  toast("Đã đăng bài.");
   els.messageInput.value = "";
   els.linkInput.value = "";
   updatePreview();
@@ -270,11 +270,11 @@ async function postNow(event) {
 
 async function schedulePost() {
   if (!els.pageSelect.value) {
-    toast("Connect and select a Page first.");
+    toast("Hãy kết nối và chọn Page trước.");
     return;
   }
   if (!els.publishAtInput.value) {
-    toast("Pick a schedule time.");
+    toast("Hãy chọn thời gian lên lịch.");
     return;
   }
 
@@ -287,7 +287,7 @@ async function schedulePost() {
       publishAt: els.publishAtInput.value
     })
   });
-  toast("Post scheduled.");
+  toast("Đã lên lịch bài viết.");
   await Promise.all([loadJobs(), loadActivity()]);
 }
 
@@ -297,11 +297,11 @@ async function handleJobsClick(event) {
 
   if (runId) {
     await api(`/api/jobs/${runId}/run`, { method: "POST", body: "{}" });
-    toast("Job published.");
+    toast("Đã đăng bài đã lên lịch.");
   }
   if (deleteId) {
     await api(`/api/jobs/${deleteId}`, { method: "DELETE" });
-    toast("Job removed.");
+    toast("Đã xóa lịch đăng.");
   }
 
   if (runId || deleteId) {
@@ -319,6 +319,22 @@ function formatDate(value) {
   }).format(date);
 }
 
+function formatStatus(value) {
+  return {
+    scheduled: "Đã lên lịch",
+    published: "Đã đăng",
+    failed: "Lỗi"
+  }[value] || value;
+}
+
+function formatActivityType(value) {
+  return {
+    success: "Thành công",
+    error: "Lỗi",
+    info: "Thông tin"
+  }[value] || value;
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -332,9 +348,9 @@ els.navItems.forEach((item) => {
   item.addEventListener("click", () => switchView(item.dataset.tab));
 });
 
-els.refreshBtn.addEventListener("click", () => refreshAll().then(() => toast("Refreshed.")).catch((error) => toast(error.message)));
-els.reloadJobsBtn.addEventListener("click", () => loadJobs().then(() => toast("Jobs refreshed.")).catch((error) => toast(error.message)));
-els.reloadActivityBtn.addEventListener("click", () => loadActivity().then(() => toast("Activity refreshed.")).catch((error) => toast(error.message)));
+els.refreshBtn.addEventListener("click", () => refreshAll().then(() => toast("Đã làm mới.")).catch((error) => toast(error.message)));
+els.reloadJobsBtn.addEventListener("click", () => loadJobs().then(() => toast("Đã làm mới lịch đăng.")).catch((error) => toast(error.message)));
+els.reloadActivityBtn.addEventListener("click", () => loadActivity().then(() => toast("Đã làm mới nhật ký.")).catch((error) => toast(error.message)));
 els.configForm.addEventListener("submit", (event) => saveConfig(event).catch((error) => toast(error.message)));
 els.composerForm.addEventListener("submit", (event) => postNow(event).catch((error) => toast(error.message)));
 els.scheduleBtn.addEventListener("click", () => schedulePost().catch((error) => toast(error.message)));
@@ -344,18 +360,18 @@ els.messageInput.addEventListener("input", updatePreview);
 els.linkInput.addEventListener("input", updatePreview);
 els.copyRedirectBtn.addEventListener("click", async () => {
   await navigator.clipboard.writeText(els.redirectUriValue.textContent);
-  toast("Redirect URI copied.");
+  toast("Đã copy Redirect URI.");
 });
 els.copySetupCallbackBtn.addEventListener("click", async () => {
   await navigator.clipboard.writeText(state.status?.redirectUri || els.redirectUriValue.textContent);
-  toast("Callback URL copied.");
+  toast("Đã copy callback URL.");
 });
 els.openSettingsBtn.addEventListener("click", () => switchView("settings"));
 els.connectBtn.addEventListener("click", (event) => {
   if (!state.status?.configured) {
     event.preventDefault();
     switchView("settings");
-    toast("Save your Meta App config first.");
+    toast("Hãy lưu cấu hình Meta App trước.");
   }
 });
 
