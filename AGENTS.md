@@ -2,7 +2,9 @@
 
 ## Project
 
-FB Page Manager is a personal Facebook Page publishing dashboard. It uses the official Meta Graph API and Facebook OAuth. Do not add username/password Facebook login, browser automation, cookie harvesting, checkpoint bypass, scraping, or spam workflows.
+FB Page Manager is intended to become a personal daily-work automation dashboard for Facebook-related publishing workflows: preparing posts, managing content templates, scheduling repeat tasks, publishing to Pages, and reducing manual work for the operator.
+
+Implementation boundary: use the official Meta Graph API and Facebook OAuth for any direct Facebook publishing action. Do not add username/password Facebook login, browser automation against Facebook, cookie harvesting, checkpoint bypass, scraping, or spam workflows. For Facebook surfaces that do not expose an official API path for this app, build preparation, queueing, reminders, export/copy helpers, or manual handoff flows instead of automated browser control.
 
 ## Startup Context
 
