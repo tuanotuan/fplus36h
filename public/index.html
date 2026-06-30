@@ -88,7 +88,83 @@
                 </select>
               </div>
 
-              <div class="field-row">
+              <div class="feature-tree" aria-label="Cây chức năng đăng tin">
+                <div class="tree-group">
+                  <div class="tree-root">
+                    <span class="tree-caret">▾</span>
+                    <span class="tree-folder">Đăng tin lên nhóm</span>
+                    <span class="tree-note">Nhóm chức năng</span>
+                  </div>
+                  <div class="tree-children">
+                    <button class="tree-item" type="button" data-destination="group" data-post-type="link">
+                      <span>Chia sẻ bài viết, ảnh, album, video, page, event...</span>
+                      <small>Soạn nội dung chia sẻ để đăng thủ công vào nhóm.</small>
+                    </button>
+                    <button class="tree-item" type="button" data-destination="group" data-post-type="photos">
+                      <span>Đăng trực tiếp giả lập nhiều ảnh</span>
+                      <small>Chuẩn bị caption và danh sách URL ảnh.</small>
+                    </button>
+                    <button class="tree-item" type="button" data-destination="group" data-post-type="link">
+                      <span>Đăng trực tiếp giả lập link website, link bài viết Facebook</span>
+                      <small>Chuẩn bị nội dung kèm liên kết.</small>
+                    </button>
+                    <button class="tree-item" type="button" data-destination="group" data-post-type="status">
+                      <span>Đăng trực tiếp giả lập status</span>
+                      <small>Chuẩn bị nội dung dạng status.</small>
+                    </button>
+                    <button class="tree-item" type="button" data-destination="group" data-post-type="product">
+                      <span>Đăng sản phẩm vào nhóm bán hàng</span>
+                      <small>Chuẩn bị thông tin sản phẩm để copy sang nhóm.</small>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="tree-group">
+                  <div class="tree-root">
+                    <span class="tree-caret">▾</span>
+                    <span class="tree-folder">Đăng sản phẩm lên Marketplace</span>
+                    <span class="tree-note">Nhóm chức năng</span>
+                  </div>
+                  <div class="tree-children">
+                    <button class="tree-item" type="button" data-destination="marketplace" data-post-type="product">
+                      <span>Tạo nội dung sản phẩm Marketplace</span>
+                      <small>Soạn tiêu đề, giá, khu vực, mô tả và ảnh sản phẩm.</small>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="tree-group">
+                  <div class="tree-root">
+                    <span class="tree-caret">▾</span>
+                    <span class="tree-folder">Đăng lên Page qua API chính thức</span>
+                    <span class="tree-note available">Khả dụng</span>
+                  </div>
+                  <div class="tree-children">
+                    <button class="tree-item active" type="button" data-destination="page" data-post-type="status">
+                      <span>Status</span>
+                      <small>Đăng status lên Page đã kết nối.</small>
+                    </button>
+                    <button class="tree-item" type="button" data-destination="page" data-post-type="link">
+                      <span>Link website hoặc bài Facebook</span>
+                      <small>Đăng bài có liên kết lên Page.</small>
+                    </button>
+                    <button class="tree-item" type="button" data-destination="page" data-post-type="photos">
+                      <span>Ảnh hoặc album nhiều ảnh</span>
+                      <small>Đăng một hoặc nhiều ảnh bằng URL công khai.</small>
+                    </button>
+                    <button class="tree-item" type="button" data-destination="page" data-post-type="video">
+                      <span>Video</span>
+                      <small>Đăng video bằng URL công khai.</small>
+                    </button>
+                    <button class="tree-item" type="button" data-destination="page" data-post-type="product">
+                      <span>Sản phẩm trên Page</span>
+                      <small>Đăng bài sản phẩm lên Page.</small>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field-row state-field" hidden>
                 <label for="destinationType">Điểm đăng</label>
                 <select id="destinationType">
                   <option value="page">Page quản lý qua Graph API</option>
@@ -101,7 +177,7 @@
                 Meta không còn mở API đăng trực tiếp lên nhóm cho app dạng này và Marketplace không có API đăng sản phẩm công khai. Ứng dụng chỉ đăng được lên Page bạn quản lý bằng quyền chính thức.
               </div>
 
-              <div class="field-row">
+              <div class="field-row state-field" hidden>
                 <label for="postType">Loại bài</label>
                 <select id="postType">
                   <option value="status">Status</option>

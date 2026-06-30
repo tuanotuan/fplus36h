@@ -2,7 +2,8 @@ const state = {
   status: null,
   pages: [],
   jobs: [],
-  activity: []
+  activity: [],
+  selectedFeatureItem: null
 };
 
 const els = {
@@ -31,6 +32,7 @@ const els = {
   destinationType: document.querySelector("#destinationType"),
   unsupportedNotice: document.querySelector("#unsupportedNotice"),
   postType: document.querySelector("#postType"),
+  featureItems: document.querySelectorAll(".tree-item"),
   messageInput: document.querySelector("#messageInput"),
   linkInput: document.querySelector("#linkInput"),
   imageUrlsInput: document.querySelector("#imageUrlsInput"),
@@ -262,8 +264,21 @@ function updateComposerFields() {
   els.contentFields.forEach((field) => {
     field.hidden = !visible.has(field.dataset.field);
   });
+  els.featureItems.forEach((item) => {
+    const active = state.selectedFeatureItem
+      ? item === state.selectedFeatureItem
+      : item.dataset.destination === els.destinationType.value && item.dataset.postType === type;
+    item.classList.toggle("active", active);
+  });
   els.unsupportedNotice.hidden = els.destinationType.value === "page";
   updatePreview();
+}
+
+function selectFeature(item) {
+  state.selectedFeatureItem = item;
+  els.destinationType.value = item.dataset.destination || "page";
+  els.postType.value = item.dataset.postType || "status";
+  updateComposerFields();
 }
 
 function summarizePayload(payload) {
@@ -481,6 +496,9 @@ els.configForm.addEventListener("submit", (event) => saveConfig(event).catch((er
 els.composerForm.addEventListener("submit", (event) => postNow(event).catch((error) => toast(error.message)));
 els.scheduleBtn.addEventListener("click", () => schedulePost().catch((error) => toast(error.message)));
 els.jobsTable.addEventListener("click", (event) => handleJobsClick(event).catch((error) => toast(error.message)));
+els.featureItems.forEach((item) => {
+  item.addEventListener("click", () => selectFeature(item));
+});
 els.pageSelect.addEventListener("change", updatePreview);
 els.destinationType.addEventListener("change", updateComposerFields);
 els.postType.addEventListener("change", updateComposerFields);

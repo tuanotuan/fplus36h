@@ -4,6 +4,7 @@
 
 Added:
 
+* Changed the composer UI to show publishing modes as a folder-like feature tree, with "Đăng tin lên nhóm" and related sub-features grouped together.
 * Added Page publishing support for status, link, public image URL, multi-image attached-media posts, public video URL posts, and product-style Page posts.
 * Added composer controls for destination type, post type, image URLs, video URL, and product details.
 * Added explicit UI/API validation for unsupported Group and Marketplace direct publishing so the app stays on official Meta Graph API behavior.
